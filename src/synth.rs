@@ -185,7 +185,7 @@ impl SyntheticVoice {
 }
 
 /// A crude sustained vowel: a train of smooth "glottal pulses", one per vocal
-/// fold cycle, like the /a/ recordings in voice-disorder databases.
+/// fold cycle, like someone holding a long "aaah".
 ///
 /// Each cycle's length is wobbled by up to ±1.5·`jitter` and each pulse's
 /// height by up to ±1.5·`shimmer` (uniformly). For uniform wobble, the mean

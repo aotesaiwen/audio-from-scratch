@@ -29,7 +29,7 @@ pressure
 Sample `n` is taken at time **t = n / sample_rate**.
 
 Common sample rates: 8 kHz (telephone), 16 kHz (most speech ML), 44.1 kHz
-(CDs), 48 kHz (video), 50 kHz (the Saarbrücken Voice Database).
+(CDs), 48 kHz (video and most audio interfaces).
 
 **The sine wave** is the simplest sound and the building block of all the
 others (lesson 08 proves that). It has a frequency `f` (cycles per second, Hz)
@@ -131,7 +131,7 @@ continuous wave, and the orange dots are what a computer at 8 kHz stores.
 1. Speech ML often uses 16 kHz but music uses 44.1 kHz. What do you think
    limits the highest frequency a sample rate can represent?
 2. Doubling the amplitude changes the samples how? Doubling the frequency?
-3. A 2-second recording at 50 kHz is resampled to 16 kHz. How many samples
+3. A 2-second recording at 44.1 kHz is resampled to 16 kHz. How many samples
    before and after?
 
 <details><summary>Answers</summary>
@@ -142,7 +142,7 @@ continuous wave, and the orange dots are what a computer at 8 kHz stores.
    reaches the limit of hearing (~20 kHz).
 2. Doubling the amplitude doubles every sample. Doubling the frequency halves
    the number of samples per cycle: the wave is squeezed in time.
-3. 100,000 before, 32,000 after.
+3. 88,200 before, 32,000 after.
 
 </details>
 

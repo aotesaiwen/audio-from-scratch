@@ -138,7 +138,8 @@ cargo run --example lesson12 -- C:\path\to\recording.wav
 1. A model trained on 16 kHz log-mels (fmax 8 kHz) is given telephone audio
    (band-limited to 3.4 kHz) upsampled to 16 kHz. What does it see?
 2. Jitter is cycle-to-cycle variation in pitch. How much of it survives into
-   13 MFCCs? What does that suggest about MFCC-only dysphonia detectors?
+   13 MFCCs? What does that suggest about using MFCCs alone to describe how
+   rough a voice sounds?
 3. Why can't you directly compare MFCCs computed by librosa with ones from
    another toolkit, even with the same n_mfcc?
 
@@ -148,8 +149,8 @@ cargo run --example lesson12 -- C:\path\to\recording.wav
    top it never saw in training. That's a classic domain shift.
 2. Very little. Frame-level smoothing (25 ms frames span several cycles),
    wide upper filters and DCT truncation all blur fine pitch structure. That's
-   why studies add jitter, shimmer and HNR as separate features, or use
-   higher-resolution spectrograms.
+   why voice analysis measures jitter, shimmer and HNR separately (lesson 14),
+   or uses higher-resolution spectrograms.
 3. Different mel formula (HTK or Slaney), filter normalisation, log
    (10·log10 with top_db, or ln), liftering, and DCT scaling all change the
    numbers.

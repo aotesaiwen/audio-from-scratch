@@ -2,17 +2,17 @@
 
 Learn audio signal processing and Rust at the same time by building a small
 librosa + Praat yourself, starting from an empty file. The repo uses no
-audio crates and hides nothing. Every step from WAV bytes to MFCCs and jitter
-is code you write.
+audio crates and hides nothing. Every step from WAV bytes to spectrograms,
+MFCCs and pitch is code you write.
 
-The course ends where voice-disorder pipelines usually begin: mel
-spectrograms, MFCCs, F0, jitter, shimmer, HNR, resampling and McAdams
-anonymisation. By the end, lines like these should read as plain
-descriptions of what happens to the signal:
+By the end you'll have built the front end that most audio and speech tools
+share: filters, spectrograms, mel features and MFCCs, pitch tracking,
+voice-quality measures and resampling. Lines like these should then read as
+plain descriptions of what happens to the signal:
 
 ```python
 librosa.feature.melspectrogram(y=y, sr=sr, n_mels=64)
-call(pointProcess, "Get jitter (local)", 0, 0, 0.0001, 0.02, 1.3)
+call(sound, "To Pitch", 0.0, 75, 600)
 torchaudio.transforms.Resample(44100, 16000)
 ```
 

@@ -72,15 +72,15 @@ to all three WAVs.
 
 ## 4. Check your understanding
 
-1. Converting 50 kHz to 16 kHz, the ratio is 16/50 = 8/25. Output sample
-   positions only ever fall at 8 different fractional offsets between input
-   samples. How could a resampler use that to run much faster than yours?
+1. Converting 44.1 kHz to 16 kHz, the ratio is 16000/44100 = 160/441. Output
+   sample positions only ever fall at 160 different fractional offsets between
+   input samples. How could a resampler use that to run much faster than yours?
 2. What does `rolloff = 0.99` buy you, and what does it cost?
 3. Why do resamplers matter for ML reproducibility?
 
 <details><summary>Answers</summary>
 
-1. Precompute the 8 kernels once and reuse them: a **polyphase** resampler.
+1. Precompute the 160 kernels once and reuse them: a **polyphase** resampler.
    Yours recomputes sinc and cos for every tap of every output sample.
 2. The filter starts cutting slightly *below* Nyquist, which gives the
    finite-length kernel room to reach full attenuation by Nyquist itself.

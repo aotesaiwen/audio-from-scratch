@@ -16,9 +16,9 @@ have implemented them.
 
 ## 1. The idea
 
-A healthy sustained vowel is *nearly* periodic: each vocal-fold cycle is
+A steady sustained vowel is *nearly* periodic: each vocal-fold cycle is
 almost the same length and the same strength, and almost all the sound
-energy is in the harmonics. Disordered voices break this in three
+energy is in the harmonics. Real voices depart from this in three
 measurable ways:
 
 | Measure | What varies | Heard as |
@@ -65,14 +65,13 @@ cycle and 1 − r doesn't (Boersma, 1993):
 r = 0.99 gives 20 dB, and r = 0.9 gives 9.5 dB. Average over voiced frames,
 as Praat's "Get mean" does.
 
-**A warning you'll see for yourself.** The demo's "healthy" voice was
+**A warning you'll see for yourself.** The demo's "smooth" voice was
 *built* with 0.3% jitter, but you'll measure more than that. Additive noise
 nudges each peak's position, and that shows up as extra jitter. Praat's
 cross-correlation method is more robust than peak picking, but no method is
-immune. So **recording conditions leak into perturbation measures.** If one
-hospital's microphones are noisier, its patients' jitter is inflated, and a
-classifier can learn "which hospital" instead of "which pathology". That's
-one concrete mechanism behind dataset bias in voice-disorder detection.
+immune. So **recording conditions leak into perturbation measures.** The
+same voice recorded through a noisier microphone measures as rougher, so
+only compare numbers from matched recording setups.
 
 ## 2. Rust for this lesson
 
@@ -110,8 +109,8 @@ Some(VoiceReport { jitter_local: jitter_local(&t, &limits)?, /* ... */ })
 1. Periods 10, 11, 10, 11 ms: what's jitter (local)?
 2. Amplitudes 1.0, 0.8, 1.0, 0.8: shimmer (local)? Shimmer (dB)?
 3. Periods 10 ms and 14 ms side by side: does Praat compare them?
-4. A common feature vector includes localJitter, rapJitter *and* ddpJitter.
-   How many independent numbers is that, really?
+4. Praat reports local, RAP *and* ddp jitter. How many independent numbers
+   is that, really?
 
 ## 4. Exercises
 
@@ -148,7 +147,7 @@ loop:
 cargo run --example lesson14
 ```
 
-It prints reports for a "healthy-ish" and a "rough" synthetic voice, writes
+It prints reports for a "smooth" and a "rough" synthetic voice, writes
 both as WAVs (listen!), and plots their cycle lengths.
 
 **Now real data.** Take a recording of a sustained /a/:
@@ -173,8 +172,9 @@ look for octave errors in your pitch track first.
 
 1. Explain every argument of `"Get shimmer (local)", 0, 0, 0.0001, 0.02, 1.3, 1.6`.
 2. Why does RAP react less than local jitter to a slow, steady pitch glide?
-3. What would you do to stop a classifier learning recording conditions
-   through jitter and HNR?
+3. Two sets of recordings were made with different microphones, and one set
+   has higher average jitter. How would you check whether that's the voices
+   or the equipment?
 
 <details><summary>Answers</summary>
 
@@ -184,11 +184,10 @@ look for octave errors in your pitch track first.
 2. In a steady glide, each period is very close to the average of itself and
    its two neighbours, so RAP's deviations stay tiny. Local jitter still sees
    every consecutive difference.
-3. Some options: check feature distributions per site and per microphone
-   before training; match recording conditions or add matched noise; report
-   results per site; use measures known to be robust to noise; and test
-   whether a model can predict the *site* from the features. If it can,
-   worry.
+3. Measure each setup's noise floor. Play or synthesise a voice with known
+   jitter (like `synth::voice`) through both and compare. Add matching noise
+   to the cleaner set and see whether the gap closes. If the difference
+   follows the equipment, it isn't about the voices.
 
 </details>
 

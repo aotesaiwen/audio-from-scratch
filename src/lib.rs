@@ -2,8 +2,7 @@
 //!
 //! You build this crate one lesson at a time. By the end it reads WAV files,
 //! filters them, computes spectrograms, mel spectrograms and MFCCs, tracks
-//! pitch, and measures jitter, shimmer and HNR. Those are the same features
-//! voice-disorder models are trained on, built here with no black boxes.
+//! pitch, and measures jitter, shimmer and HNR, all with no black boxes.
 //!
 //! The course map is in `README.md`. Each module says which lesson fills it in.
 

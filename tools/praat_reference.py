@@ -1,7 +1,6 @@
 """Praat's numbers for one recording, to compare with lesson 14's report.
 
-Uses the same Praat calls as a typical voice-disorder feature script
-(To Pitch, To PointProcess (periodic, cc), To Harmonicity (cc), and the
+Uses Praat's standard voice-analysis calls (To Pitch, To PointProcess (periodic, cc), To Harmonicity (cc), and the
 0.0001 / 0.02 / 1.3 / 1.6 limits).
 
     pip install praat-parselmouth

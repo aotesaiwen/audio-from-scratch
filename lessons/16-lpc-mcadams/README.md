@@ -3,8 +3,8 @@
 > **Audio:** linear prediction, the source–filter model, poles and formants, voice anonymisation · **Rust:** practice (complex arithmetic, numerical iteration)
 > **You edit:** `src/lpc.rs` · **Check:** `cargo test l16` · **Demo:** `cargo run --example lesson16` · **Time:** ~3 h
 
-The McAdams-coefficient anonymiser (VoicePrivacy Challenge baseline B2) is
-built entirely from things you now have: autocorrelation (13), FIR
+The McAdams voice transformation, a classic way to disguise who is speaking
+without any training data, is built entirely from things you now have: autocorrelation (13), FIR
 filtering (06), complex numbers (08), framing and windows (05, 10).
 
 ## 1. The idea
@@ -53,7 +53,7 @@ repeatedly nudge each one by P(z) / (product of distances to the other
 guesses) until nothing moves. It's simple, and reuses your Complex type
 (Div is provided). numpy's `np.roots` uses eigenvalues of a companion matrix instead.
 
-**The recipe** (the VoicePrivacy B2 baseline): 20 ms frames every 10 ms, √(Hann) windows normalised so overlaps add
+**The recipe**: 20 ms frames every 10 ms, √(Hann) windows normalised so overlaps add
 to 1, LPC order 20, α = 0.8, overlap-add, then normalise the peak.
 
 ## 2. Exercises

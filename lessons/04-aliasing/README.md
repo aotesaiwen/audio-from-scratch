@@ -39,7 +39,7 @@ That gives three practical rules:
 
 1. **Before sampling**, an analogue filter removes everything above Nyquist.
    (Your microphone interface does this.)
-2. **Before downsampling** digitally (50 kHz → 16 kHz), remove everything above
+2. **Before downsampling** digitally (48 kHz → 16 kHz), remove everything above
    the *new* Nyquist (8 kHz) first, or it folds into the speech band. That's
    lesson 15.
 3. **When synthesising** sharp waveforms, sharp corners contain energy at
@@ -120,20 +120,19 @@ cargo run --example lesson04
 
 ## 6. Check your understanding
 
-1. A dataset recorded at 50 kHz is resampled to 16 kHz. What must happen to
+1. A recording made at 48 kHz is resampled to 16 kHz. What must happen to
    the signal *before* samples are dropped, and what would go wrong otherwise?
-2. A 16 kHz recording has nothing above 8 kHz. Could that matter for
-   detecting voice disorders?
+2. A 16 kHz recording has nothing above 8 kHz. Which sounds lose the most?
 3. Why does the zero-crossing frequency estimate fail on a real voice?
 
 <details><summary>Answers</summary>
 
 1. A low-pass filter has to remove everything above 8 kHz. Otherwise energy
-   between 8 and 25 kHz (breath noise, fricatives) folds down into 0–8 kHz,
+   between 8 and 24 kHz (breath noise, fricatives) folds down into 0–8 kHz,
    where it masquerades as speech-band content.
-2. Possibly. Breathy and hoarse voices add turbulent noise, some of it
-   high-frequency. Most clinical measures (F0, jitter, shimmer, HNR) live well
-   below 8 kHz, but a model looking for "breathiness" loses part of the cue.
+2. Sounds with energy up high: "s" and "sh", breath noise, cymbals and other
+   bright percussion. Pitch and vowel formants sit well below 8 kHz, so
+   speech stays clear, but it sounds duller and music loses its sparkle.
 3. A voice has many harmonics and formants, so the waveform wiggles across
    zero several times per cycle. Crossings measure the dominant *formant*
    region more than F0. Lesson 13 uses a better method.

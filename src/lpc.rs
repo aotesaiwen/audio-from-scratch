@@ -1,9 +1,9 @@
 //! Lesson 16 (bonus): LPC and McAdams voice anonymisation.
 //! See `lessons/16-lpc-mcadams/README.md`.
 //!
-//! The source–filter model of speech, and the McAdams-coefficient
-//! anonymiser (the VoicePrivacy Challenge's B2 baseline), built from parts
-//! you made earlier: autocorrelation, FIR filtering, complex numbers.
+//! The source–filter model of speech, and McAdams voice anonymisation,
+//! built from parts you made earlier: autocorrelation, FIR filtering,
+//! complex numbers.
 //! Check with `cargo test l16`, then run `cargo run --example lesson16`.
 
 use crate::complex::Complex;
@@ -160,7 +160,7 @@ pub fn mcadams(a: &[f64], alpha: f64) -> Vec<f64> {
     poly_from_roots(&moved)
 }
 
-/// Anonymise speech, following the VoicePrivacy B2 recipe:
+/// Anonymise speech with the standard McAdams recipe:
 /// - frames of 20 ms every 10 ms, LPC order 20
 /// - analysis/synthesis window: w = √(hann(frame_len) / K), where
 ///   K = Σ hann / hop (so the overlapped windows add back to 1)

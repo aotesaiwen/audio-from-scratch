@@ -147,7 +147,7 @@ cargo run --example lesson07
 
 1. Why does the telephone chain use two high-passes and two low-passes
    rather than one of each?
-2. Of the usual voice-disorder features (F0, jitter, shimmer, HNR, MFCCs,
+2. Of these common speech features (F0, jitter, shimmer, HNR, MFCCs,
    mel spectra), which describe the source, and which the filter?
 3. Why are IIR filters a poor choice when the exact *timing* of features
    matters, for example aligning onsets across frequency bands?
