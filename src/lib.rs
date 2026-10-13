@@ -6,6 +6,10 @@
 //!
 //! The course map is in `README.md`. Each module says which lesson fills it in.
 
+// Unfinished exercises leave unused parameters lying around, which would bury
+// you in warnings. This line silences them. Delete it once you've finished the
+// course and see what the compiler thinks of your code.
+#![allow(unused_variables, unused_mut, dead_code, unused_imports)]
 
 // Given code: read it whenever you like, but you don't have to write it.
 pub mod plot;

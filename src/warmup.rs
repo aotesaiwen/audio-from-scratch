@@ -9,46 +9,37 @@
 /// MIDI note 69 is concert A, 440 Hz. Each semitone multiplies the frequency
 /// by 2^(1/12), so 12 semitones (an octave) doubles it: note 81 is 880 Hz.
 pub fn midi_to_hz(note: u8) -> f64 {
-    440.0 * 2f64.powf((note as f64 - 69.0) / 12.0)
+    // `note` is a u8 (a whole number from 0 to 255). Before doing float maths
+    // with it, convert it: `note as f64`. Powers: `base.powf(exponent)`.
+    todo!("l00: midi_to_hz")
 }
 
 /// The inverse: a frequency in Hz to a (fractional) MIDI note number.
 /// 440.0 gives 69.0; 466.16 gives about 70.0.
 pub fn hz_to_midi(hz: f64) -> f64 {
-    69.0 + 12.0 * (hz / 440.0).log2()
+    // Undo each step of midi_to_hz in reverse order. f64 has `.log2()`.
+    todo!("l00: hz_to_midi")
 }
 
 /// The arithmetic mean of a list of numbers. An empty list has mean 0.0.
 pub fn mean(xs: &[f64]) -> f64 {
-    if xs.is_empty() {
-        return 0.0;
-    }
-    let mut total = 0.0;
-    for &x in xs {
-        total += x;
-    }
-    total / xs.len() as f64
+    // `for x in xs { ... }` hands you each element as `&f64`, a reference.
+    // Write `*x` to get the number, or loop with `for &x in xs` to unpack it.
+    // `xs.len()` is a usize, so it needs `as f64` before you divide by it.
+    todo!("l00: mean")
 }
 
 /// How many values are strictly greater than `threshold`?
 pub fn count_above(xs: &[f64], threshold: f64) -> usize {
-    let mut count = 0;
-    for &x in xs {
-        if x > threshold {
-            count += 1;
-        }
-    }
-    count
+    todo!("l00: count_above")
 }
 
 /// A new Vec with the values in reverse order. Playing audio backwards is
 /// exactly this. Write the loop yourself rather than calling `.reverse()`.
 pub fn reversed(xs: &[f64]) -> Vec<f64> {
-    let mut out = Vec::with_capacity(xs.len());
-    for i in (0..xs.len()).rev() {
-        out.push(xs[i]);
-    }
-    out
+    // Start with `let mut out = Vec::new();` and add values with `out.push(v)`.
+    // Read element i with `xs[i]`.
+    todo!("l00: reversed")
 }
 
 #[cfg(test)]

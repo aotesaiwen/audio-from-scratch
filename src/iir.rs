@@ -18,7 +18,7 @@ pub trait Filter {
     /// Filter a whole signal. A *default method*: every Filter gets it for
     /// free, built on top of `process_sample`.
     fn process(&mut self, x: &[f64]) -> Vec<f64> {
-        x.iter().map(|&v| self.process_sample(v)).collect()
+        todo!("l07: Filter::process")
     }
 }
 
@@ -33,19 +33,18 @@ impl OnePoleLowpass {
     /// `a = exp(−2π · cutoff / sample_rate)`. That puts the −3 dB point at
     /// `cutoff_hz` (approximately; it's exact for cutoffs far below Nyquist).
     pub fn new(cutoff_hz: f64, sample_rate: u32) -> Self {
-        OnePoleLowpass { a: (-2.0 * PI * cutoff_hz / sample_rate as f64).exp(), y1: 0.0 }
+        // Build the struct with `OnePoleLowpass { a: ..., y1: 0.0 }`.
+        todo!("l07: OnePoleLowpass::new")
     }
 }
 
 impl Filter for OnePoleLowpass {
     fn process_sample(&mut self, x: f64) -> f64 {
-        let y = (1.0 - self.a) * x + self.a * self.y1;
-        self.y1 = y;
-        y
+        todo!("l07: OnePoleLowpass::process_sample")
     }
 
     fn reset(&mut self) {
-        self.y1 = 0.0;
+        todo!("l07: OnePoleLowpass::reset")
     }
 }
 
@@ -59,21 +58,17 @@ pub struct DcBlocker {
 
 impl DcBlocker {
     pub fn new(r: f64) -> Self {
-        DcBlocker { r, x1: 0.0, y1: 0.0 }
+        todo!("l07: DcBlocker::new")
     }
 }
 
 impl Filter for DcBlocker {
     fn process_sample(&mut self, x: f64) -> f64 {
-        let y = x - self.x1 + self.r * self.y1;
-        self.x1 = x;
-        self.y1 = y;
-        y
+        todo!("l07: DcBlocker::process_sample")
     }
 
     fn reset(&mut self) {
-        self.x1 = 0.0;
-        self.y1 = 0.0;
+        todo!("l07: DcBlocker::reset")
     }
 }
 
@@ -112,58 +107,29 @@ impl Biquad {
 
     /// Low-pass. `q` = 0.7071 (1/√2) gives the flattest passband (Butterworth).
     pub fn lowpass(cutoff_hz: f64, q: f64, sample_rate: u32) -> Self {
-        let (cos_w0, alpha) = cookbook_terms(cutoff_hz, q, sample_rate);
-        Biquad::from_coefficients(
-            (1.0 - cos_w0) / 2.0,
-            1.0 - cos_w0,
-            (1.0 - cos_w0) / 2.0,
-            1.0 + alpha,
-            -2.0 * cos_w0,
-            1.0 - alpha,
-        )
+        // Formulas are in the README. Compute w0, cos(w0) and alpha first.
+        todo!("l07: Biquad::lowpass")
     }
 
     /// High-pass.
     pub fn highpass(cutoff_hz: f64, q: f64, sample_rate: u32) -> Self {
-        let (cos_w0, alpha) = cookbook_terms(cutoff_hz, q, sample_rate);
-        Biquad::from_coefficients(
-            (1.0 + cos_w0) / 2.0,
-            -(1.0 + cos_w0),
-            (1.0 + cos_w0) / 2.0,
-            1.0 + alpha,
-            -2.0 * cos_w0,
-            1.0 - alpha,
-        )
+        todo!("l07: Biquad::highpass")
     }
 
     /// Band-pass with 0 dB gain at the centre frequency. Higher `q`, narrower band.
     pub fn bandpass(center_hz: f64, q: f64, sample_rate: u32) -> Self {
-        let (cos_w0, alpha) = cookbook_terms(center_hz, q, sample_rate);
-        Biquad::from_coefficients(alpha, 0.0, -alpha, 1.0 + alpha, -2.0 * cos_w0, 1.0 - alpha)
+        todo!("l07: Biquad::bandpass")
     }
-}
-
-/// cos(w0) and alpha, shared by every cookbook filter.
-fn cookbook_terms(freq: f64, q: f64, sample_rate: u32) -> (f64, f64) {
-    let w0 = 2.0 * PI * freq / sample_rate as f64;
-    (w0.cos(), w0.sin() / (2.0 * q))
 }
 
 impl Filter for Biquad {
     fn process_sample(&mut self, x: f64) -> f64 {
-        let y = self.b0 * x + self.b1 * self.x1 + self.b2 * self.x2 - self.a1 * self.y1 - self.a2 * self.y2;
-        self.x2 = self.x1;
-        self.x1 = x;
-        self.y2 = self.y1;
-        self.y1 = y;
-        y
+        // Compute y, then shift the memory along: x2 ← x1, x1 ← x, and the same for y.
+        todo!("l07: Biquad::process_sample")
     }
 
     fn reset(&mut self) {
-        self.x1 = 0.0;
-        self.x2 = 0.0;
-        self.y1 = 0.0;
-        self.y2 = 0.0;
+        todo!("l07: Biquad::reset")
     }
 }
 
@@ -183,24 +149,18 @@ impl FilterChain {
 
     /// Add a filter to the end of the chain (builder style, returns self).
     pub fn then(mut self, filter: impl Filter + 'static) -> Self {
-        self.filters.push(Box::new(filter));
-        self
+        // `Box::new(filter)` puts it on the heap.
+        todo!("l07: FilterChain::then")
     }
 }
 
 impl Filter for FilterChain {
     fn process_sample(&mut self, x: f64) -> f64 {
-        let mut v = x;
-        for f in self.filters.iter_mut() {
-            v = f.process_sample(v);
-        }
-        v
+        todo!("l07: FilterChain::process_sample")
     }
 
     fn reset(&mut self) {
-        for f in self.filters.iter_mut() {
-            f.reset();
-        }
+        todo!("l07: FilterChain::reset")
     }
 }
 

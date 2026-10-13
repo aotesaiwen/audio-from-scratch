@@ -7,7 +7,7 @@ use std::f64::consts::PI;
 
 /// Real samples to complex numbers with zero imaginary part.
 pub fn to_complex(x: &[f64]) -> Vec<Complex> {
-    x.iter().map(|&v| Complex::new(v, 0.0)).collect()
+    todo!("l08: to_complex")
 }
 
 /// The DFT, straight from the definition:
@@ -15,55 +15,34 @@ pub fn to_complex(x: &[f64]) -> Vec<Complex> {
 /// Each X[k] measures how much of the frequency "k cycles per N samples"
 /// the signal contains. Two nested loops, so N² multiplications.
 pub fn dft(x: &[Complex]) -> Vec<Complex> {
-    let big_n = x.len();
-    (0..big_n)
-        .map(|k| {
-            let mut sum = Complex::ZERO;
-            for (n, &xn) in x.iter().enumerate() {
-                let angle = -2.0 * PI * ((k * n) % big_n) as f64 / big_n as f64;
-                sum += xn * Complex::expj(angle);
-            }
-            sum
-        })
-        .collect()
+    // Tip: the angle only matters modulo 2π, so use `(k * n) % big_n` before
+    // converting to f64. That keeps the angle small and the result accurate.
+    todo!("l08: dft")
 }
 
 /// The inverse DFT: x[n] = (1/N) · Σ_k X[k] · e^(+j·2π·k·n/N).
 /// Same as the DFT with the sign of the angle flipped, then divided by N.
 pub fn idft(spectrum: &[Complex]) -> Vec<Complex> {
-    let big_n = spectrum.len();
-    (0..big_n)
-        .map(|n| {
-            let mut sum = Complex::ZERO;
-            for (k, &xk) in spectrum.iter().enumerate() {
-                let angle = 2.0 * PI * ((k * n) % big_n) as f64 / big_n as f64;
-                sum += xk * Complex::expj(angle);
-            }
-            sum * (1.0 / big_n as f64)
-        })
-        .collect()
+    todo!("l08: idft")
 }
 
 /// The frequency in Hz of DFT bin `k`, for an `n`-point DFT.
 pub fn bin_frequency(k: usize, n: usize, sample_rate: u32) -> f64 {
-    k as f64 * sample_rate as f64 / n as f64
+    todo!("l08: bin_frequency")
 }
 
 /// |X[k]| for k = 0 ..= N/2: the magnitude spectrum of a real signal. The
 /// upper half of the DFT mirrors the lower half for real input, so it adds
 /// no information.
 pub fn magnitude_spectrum(x: &[f64]) -> Vec<f64> {
-    if x.is_empty() {
-        return Vec::new();
-    }
-    dft(&to_complex(x))[..=x.len() / 2].iter().map(|c| c.abs()).collect()
+    todo!("l08: magnitude_spectrum")
 }
 
 /// The frequency of the strongest component, ignoring bin 0 (DC).
 pub fn peak_frequency(x: &[f64], sample_rate: u32) -> f64 {
-    let mags = magnitude_spectrum(x);
-    let k = (1..mags.len()).max_by(|&a, &b| mags[a].total_cmp(&mags[b])).unwrap_or(0);
-    bin_frequency(k, x.len(), sample_rate)
+    // To find the index of the largest value, track (best_index, best_value)
+    // in a loop, or look up `Iterator::max_by` and `f64::total_cmp`.
+    todo!("l08: peak_frequency")
 }
 
 #[cfg(test)]

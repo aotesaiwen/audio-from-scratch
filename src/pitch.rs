@@ -31,14 +31,8 @@ impl Default for PitchConfig {
 /// r[lag] = Σ_n x[n] · x[n + lag], for lag = 0 ..= max_lag.
 /// Lags at or beyond the frame length have nothing to overlap: give them 0.
 pub fn autocorrelation(x: &[f64], max_lag: usize) -> Vec<f64> {
-    (0..=max_lag)
-        .map(|lag| {
-            if lag >= x.len() {
-                return 0.0;
-            }
-            x[..x.len() - lag].iter().zip(&x[lag..]).map(|(a, b)| a * b).sum()
-        })
-        .collect()
+    // For each lag, pair up x[..len−lag] with x[lag..] using zip.
+    todo!("l13: autocorrelation")
 }
 
 /// Normalised autocorrelation: the correlation between `a = x[..len−lag]`
@@ -48,19 +42,7 @@ pub fn autocorrelation(x: &[f64], max_lag: usize) -> Vec<f64> {
 /// whatever the loudness, and it doesn't shrink at long lags the way raw
 /// autocorrelation does. Lags with zero energy, or beyond the frame: 0.
 pub fn normalized_autocorrelation(x: &[f64], max_lag: usize) -> Vec<f64> {
-    (0..=max_lag)
-        .map(|lag| {
-            if lag >= x.len() {
-                return 0.0;
-            }
-            let (a, b) = (&x[..x.len() - lag], &x[lag..]);
-            let dot: f64 = a.iter().zip(b).map(|(p, q)| p * q).sum();
-            let energy_a: f64 = a.iter().map(|v| v * v).sum();
-            let energy_b: f64 = b.iter().map(|v| v * v).sum();
-            let denom = (energy_a * energy_b).sqrt();
-            if denom > 0.0 { dot / denom } else { 0.0 }
-        })
-        .collect()
+    todo!("l13: normalized_autocorrelation")
 }
 
 /// Fit a parabola through y[i−1], y[i], y[i+1] and return its peak as
@@ -70,16 +52,7 @@ pub fn normalized_autocorrelation(x: &[f64], max_lag: usize) -> Vec<f64> {
 /// At either end of `y`, or if the three points are in a straight line,
 /// return (i, y[i]) unchanged.
 pub fn parabolic_peak(y: &[f64], i: usize) -> (f64, f64) {
-    if i == 0 || i + 1 >= y.len() {
-        return (i as f64, y[i]);
-    }
-    let (a, b, c) = (y[i - 1], y[i], y[i + 1]);
-    let denom = a - 2.0 * b + c;
-    if denom == 0.0 {
-        return (i as f64, b);
-    }
-    let p = 0.5 * (a - c) / denom;
-    (i as f64 + p, b - 0.25 * (a - c) * p)
+    todo!("l13: parabolic_peak")
 }
 
 /// The heart of the pitch tracker. Returns `Some((period_in_samples,
@@ -96,48 +69,28 @@ pub fn parabolic_peak(y: &[f64], i: usize) -> (f64, f64) {
 ///    also repeats every 2T, 3T, ...
 /// 5. Refine it with `parabolic_peak` and return (position, value).
 pub fn periodicity(frame: &[f64], sample_rate: u32, cfg: &PitchConfig) -> Option<(f64, f64)> {
-    let sr = sample_rate as f64;
-    let min_lag = ((sr / cfg.fmax).floor() as usize).max(1);
-    let max_lag = (sr / cfg.fmin).ceil() as usize;
-    if frame.len() <= max_lag + 1 || min_lag > max_lag {
-        return None;
-    }
-    let r = normalized_autocorrelation(frame, max_lag + 1);
-    let best = r[min_lag..=max_lag].iter().copied().fold(f64::NEG_INFINITY, f64::max);
-    if best < cfg.voicing_threshold {
-        return None;
-    }
-    let lag = (min_lag..=max_lag).find(|&l| r[l] >= 0.9 * best && r[l] >= r[l - 1] && r[l] >= r[l + 1])?;
-    Some(parabolic_peak(&r, lag))
+    // `Iterator::find` returns an Option, and `?` returns None early if it's
+    // None. That's how Option and `?` work together.
+    todo!("l13: periodicity")
 }
 
 /// F0 (Hz) of one frame, or None if unvoiced.
 pub fn estimate_f0(frame: &[f64], sample_rate: u32, cfg: &PitchConfig) -> Option<f64> {
-    periodicity(frame, sample_rate, cfg).map(|(lag, _)| sample_rate as f64 / lag)
+    // `option.map(|value| ...)` transforms what's inside a Some.
+    todo!("l13: estimate_f0")
 }
 
 /// Run `estimate_f0` on every frame: one Option<f64> per hop.
 pub fn pitch_track(x: &[f64], sample_rate: u32, cfg: &PitchConfig) -> Vec<Option<f64>> {
-    let frame_len = (cfg.frame_seconds * sample_rate as f64).round() as usize;
-    let hop = ((cfg.hop_seconds * sample_rate as f64).round() as usize).max(1);
-    frames(x, frame_len, hop)
-        .iter()
-        .map(|f| estimate_f0(f, sample_rate, cfg))
-        .collect()
+    todo!("l13: pitch_track")
 }
 
 /// Mean and sample standard deviation (dividing by n − 1, as Praat does)
 /// of the voiced frames, like Praat's "Get mean" / "Get standard deviation".
 /// None if fewer than two frames are voiced.
 pub fn mean_and_std(track: &[Option<f64>]) -> Option<(f64, f64)> {
-    let voiced: Vec<f64> = track.iter().flatten().copied().collect();
-    if voiced.len() < 2 {
-        return None;
-    }
-    let n = voiced.len() as f64;
-    let mean = voiced.iter().sum::<f64>() / n;
-    let var = voiced.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / (n - 1.0);
-    Some((mean, var.sqrt()))
+    // `track.iter().flatten()` skips the Nones and unwraps the Somes.
+    todo!("l13: mean_and_std")
 }
 
 #[cfg(test)]

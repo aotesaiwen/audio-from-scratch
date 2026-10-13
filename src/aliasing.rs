@@ -9,7 +9,7 @@ use std::f64::consts::PI;
 /// The Nyquist frequency: half the sample rate. The highest frequency a
 /// sampled signal can represent unambiguously.
 pub fn nyquist(sample_rate: u32) -> f64 {
-    sample_rate as f64 / 2.0
+    todo!("l04: nyquist")
 }
 
 /// The frequency you actually get (between 0 and Nyquist) when you sample a
@@ -19,59 +19,47 @@ pub fn nyquist(sample_rate: u32) -> f64 {
 /// number k, or from its mirror image `sample_rate − freq`. So: wrap `freq`
 /// into [0, sample_rate), then fold anything above Nyquist back down.
 pub fn alias_frequency(freq: f64, sample_rate: u32) -> f64 {
-    let sr = sample_rate as f64;
-    let f = freq.abs().rem_euclid(sr);
-    if f > sr / 2.0 { sr - f } else { f }
+    // `a.rem_euclid(b)` is the remainder of a / b, always in [0, b), even
+    // for negative a (unlike `%`). An `if` in Rust is an expression:
+    //     let y = if cond { a } else { b };
+    todo!("l04: alias_frequency")
 }
 
 /// Count sign changes between neighbouring samples. Treat 0.0 as positive
 /// (librosa does the same), so [0.0, 1.0] has no crossing.
 pub fn zero_crossings(x: &[f64]) -> usize {
-    x.windows(2).filter(|w| (w[0] >= 0.0) != (w[1] >= 0.0)).count()
+    // `x.windows(2)` walks overlapping pairs [x0,x1], [x1,x2], ...
+    // `.filter(|w| ...)` keeps the ones where the condition is true, and
+    // `.count()` counts what's left.
+    todo!("l04: zero_crossings")
 }
 
 /// Estimate a sine's frequency by counting zero crossings: a sine crosses
 /// zero twice per cycle.
 pub fn estimate_frequency(x: &[f64], sample_rate: u32) -> f64 {
-    let seconds = x.len() as f64 / sample_rate as f64;
-    zero_crossings(x) as f64 / (2.0 * seconds)
+    todo!("l04: estimate_frequency")
 }
 
 /// A square wave made the naive way: +1 when a sine is ≥ 0, −1 otherwise.
 /// Its sharp corners contain harmonics far above Nyquist, and they alias.
 pub fn naive_square(freq: f64, sample_rate: u32, seconds: f64) -> Vec<f64> {
-    sine(freq, 1.0, sample_rate, seconds)
-        .iter()
-        .map(|&s| if s >= 0.0 { 1.0 } else { -1.0 })
-        .collect()
+    todo!("l04: naive_square")
 }
 
 /// A square wave is the sum of its odd harmonics (k = 1, 3, 5, ...) with
 /// amplitude 4/(πk). How many of them lie strictly below Nyquist?
 pub fn odd_harmonics_below_nyquist(freq: f64, sample_rate: u32) -> usize {
-    let ny = nyquist(sample_rate);
-    let mut count = 0;
-    let mut k = 1.0;
-    while k * freq < ny {
-        count += 1;
-        k += 2.0;
-    }
-    count
+    // A `while` loop over k = 1, 3, 5, ... is the clearest way.
+    todo!("l04: odd_harmonics_below_nyquist")
 }
 
 /// Build a square wave from its first `n_harmonics` odd harmonics:
 /// Σ (4/(πk)) · sin(2π·k·freq·t) for k = 1, 3, 5, ... (n_harmonics terms).
 /// Stop below Nyquist and nothing aliases: a "band-limited" square wave.
 pub fn square_from_harmonics(freq: f64, sample_rate: u32, seconds: f64, n_harmonics: usize) -> Vec<f64> {
-    let mut out = vec![0.0; num_samples(sample_rate, seconds)];
-    for i in 0..n_harmonics {
-        let k = (2 * i + 1) as f64;
-        let h = sine(k * freq, 4.0 / (PI * k), sample_rate, seconds);
-        for (o, v) in out.iter_mut().zip(&h) {
-            *o += v;
-        }
-    }
-    out
+    // `.iter_mut()` gives mutable references, so you can write
+    //     for (o, v) in out.iter_mut().zip(&h) { *o += v; }
+    todo!("l04: square_from_harmonics")
 }
 
 #[cfg(test)]

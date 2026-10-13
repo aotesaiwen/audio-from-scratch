@@ -7,48 +7,36 @@ use std::f64::consts::PI;
 /// How many samples make up `seconds` of audio at `sample_rate` Hz?
 /// Round to the nearest whole sample.
 pub fn num_samples(sample_rate: u32, seconds: f64) -> usize {
-    (sample_rate as f64 * seconds).round() as usize
+    // Convert sample_rate to f64, multiply, then `.round()` and `as usize`.
+    todo!("l01: num_samples")
 }
 
 /// The time, in seconds, of each of the first `n` samples:
 /// `[0, 1/sr, 2/sr, ...]`.
 pub fn time_axis(sample_rate: u32, n: usize) -> Vec<f64> {
-    let mut t = Vec::with_capacity(n);
-    for i in 0..n {
-        t.push(i as f64 / sample_rate as f64);
-    }
-    t
+    todo!("l01: time_axis")
 }
 
 /// How many samples one cycle of a `freq` Hz wave lasts. Usually not a
 /// whole number: a 440 Hz cycle at 44.1 kHz is 100.227... samples long.
 pub fn samples_per_cycle(freq: f64, sample_rate: u32) -> f64 {
-    sample_rate as f64 / freq
+    todo!("l01: samples_per_cycle")
 }
 
 /// A sine wave lasting `seconds`:  x[n] = amplitude · sin(2π · freq · t),
 /// where t = n / sample_rate is the time of sample n.
 pub fn sine(freq: f64, amplitude: f64, sample_rate: u32, seconds: f64) -> Vec<f64> {
-    let n = num_samples(sample_rate, seconds);
-    let mut x = Vec::with_capacity(n);
-    for i in 0..n {
-        let t = i as f64 / sample_rate as f64;
-        x.push(amplitude * (2.0 * PI * freq * t).sin());
-    }
-    x
+    // Reuse num_samples. `PI` is already imported at the top of this file.
+    // `sin` is a method on f64: `(2.0 * PI * freq * t).sin()`.
+    todo!("l01: sine")
 }
 
 /// Several sines added together, each with the same amplitude: a chord.
 /// The result is as long as a single `sine` of that duration.
 pub fn chord(freqs: &[f64], amplitude: f64, sample_rate: u32, seconds: f64) -> Vec<f64> {
-    let mut out = vec![0.0; num_samples(sample_rate, seconds)];
-    for &f in freqs {
-        let s = sine(f, amplitude, sample_rate, seconds);
-        for i in 0..out.len() {
-            out[i] += s[i];
-        }
-    }
-    out
+    // `vec![0.0; n]` makes n zeros. Build one sine per frequency and add it
+    // in, sample by sample. `out[i] += s[i];` works on a `let mut out`.
+    todo!("l01: chord")
 }
 
 #[cfg(test)]

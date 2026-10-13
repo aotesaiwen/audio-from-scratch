@@ -9,37 +9,24 @@ use std::f64::consts::PI;
 /// Keep every `factor`-th sample and drop the rest. Fast and wrong: anything
 /// above the new Nyquist frequency aliases.
 pub fn decimate_naive(x: &[f64], factor: usize) -> Vec<f64> {
-    x.iter().step_by(factor).copied().collect()
+    todo!("l15: decimate_naive")
 }
 
 /// Number of output samples: round(len · sr_out / sr_in).
 pub fn output_len(len: usize, sr_in: u32, sr_out: u32) -> usize {
-    (len as f64 * sr_out as f64 / sr_in as f64).round() as usize
+    todo!("l15: output_len")
 }
 
 /// Resample by drawing straight lines between input samples. Output sample
 /// i sits at input position t = i · sr_in / sr_out; blend the two input
 /// samples either side of t. Past the last sample, hold the last value.
 pub fn resample_linear(x: &[f64], sr_in: u32, sr_out: u32) -> Vec<f64> {
-    if x.is_empty() {
-        return Vec::new();
-    }
-    let step = sr_in as f64 / sr_out as f64;
-    let last = x.len() - 1;
-    (0..output_len(x.len(), sr_in, sr_out))
-        .map(|i| {
-            let t = i as f64 * step;
-            let k = (t.floor() as usize).min(last);
-            let frac = t - k as f64;
-            let (a, b) = (x[k], x[(k + 1).min(last)]);
-            a + (b - a) * frac
-        })
-        .collect()
+    todo!("l15: resample_linear")
 }
 
 /// The normalised sinc function, sin(πx)/(πx), with sinc(0) = 1.
 pub fn sinc(x: f64) -> f64 {
-    if x.abs() < 1e-12 { 1.0 } else { (PI * x).sin() / (PI * x) }
+    todo!("l15: sinc")
 }
 
 /// Band-limited resampling with a Hann-windowed sinc kernel.
@@ -57,26 +44,7 @@ pub fn sinc(x: f64) -> f64 {
 ///
 /// Skip k outside the signal (treat those samples as zero).
 pub fn resample_sinc(x: &[f64], sr_in: u32, sr_out: u32, zero_crossings: usize) -> Vec<f64> {
-    if x.is_empty() {
-        return Vec::new();
-    }
-    let ratio = sr_out as f64 / sr_in as f64;
-    let cutoff = 0.99 * ratio.min(1.0);
-    let half_width = zero_crossings as f64 / cutoff;
-    (0..output_len(x.len(), sr_in, sr_out))
-        .map(|i| {
-            let t = i as f64 / ratio;
-            let k_min = (t - half_width).ceil().max(0.0) as usize;
-            let k_max = ((t + half_width).floor() as usize).min(x.len() - 1);
-            (k_min..=k_max)
-                .map(|k| {
-                    let d = t - k as f64;
-                    let w = 0.5 + 0.5 * (PI * d / half_width).cos();
-                    x[k] * cutoff * sinc(cutoff * d) * w
-                })
-                .sum()
-        })
-        .collect()
+    todo!("l15: resample_sinc")
 }
 
 #[cfg(test)]

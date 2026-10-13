@@ -10,12 +10,12 @@ use std::f64::consts::PI;
 /// (librosa's default is the slightly different "Slaney" mel scale; pass
 /// `htk=True` to librosa to get this one.)
 pub fn hz_to_mel(hz: f64) -> f64 {
-    2595.0 * (1.0 + hz / 700.0).log10()
+    todo!("l12: hz_to_mel")
 }
 
 /// Mel to Hz: the inverse of `hz_to_mel`.
 pub fn mel_to_hz(mel: f64) -> f64 {
-    700.0 * (10f64.powf(mel / 2595.0) - 1.0)
+    todo!("l12: mel_to_hz")
 }
 
 /// A bank of `n_mels` triangular filters, `[filter][bin]`, each row as long
@@ -27,45 +27,24 @@ pub fn mel_to_hz(mel: f64) -> f64 {
 /// at every bin's frequency (no normalisation: peaks are 1).
 /// This matches `librosa.filters.mel(..., htk=True, norm=None)`.
 pub fn mel_filterbank(n_mels: usize, n_fft: usize, sample_rate: u32, fmin: f64, fmax: f64) -> Vec<Vec<f64>> {
-    let (mel_lo, mel_hi) = (hz_to_mel(fmin), hz_to_mel(fmax));
-    let edges: Vec<f64> = (0..n_mels + 2)
-        .map(|i| mel_to_hz(mel_lo + (mel_hi - mel_lo) * i as f64 / (n_mels + 1) as f64))
-        .collect();
-    let freqs = bin_frequencies(n_fft, sample_rate);
-    (0..n_mels)
-        .map(|m| {
-            let (lo, centre, hi) = (edges[m], edges[m + 1], edges[m + 2]);
-            freqs
-                .iter()
-                .map(|&f| {
-                    let rising = (f - lo) / (centre - lo);
-                    let falling = (hi - f) / (hi - centre);
-                    rising.min(falling).max(0.0)
-                })
-                .collect()
-        })
-        .collect()
+    // For a bin at frequency f and a triangle (lo, centre, hi):
+    //     rising  = (f − lo) / (centre − lo)
+    //     falling = (hi − f) / (hi − centre)
+    //     weight  = the smaller of the two, but never below 0
+    todo!("l12: mel_filterbank")
 }
 
 /// Apply a filterbank to every frame of a power spectrogram:
 /// out[frame][m] = Σ_bin fb[m][bin] · power[frame][bin].
 /// That's a matrix product, written as nested iterators.
 pub fn apply_filterbank(power: &[Vec<f64>], fb: &[Vec<f64>]) -> Vec<Vec<f64>> {
-    power
-        .iter()
-        .map(|frame| {
-            fb.iter()
-                .map(|filter| filter.iter().zip(frame).map(|(w, p)| w * p).sum())
-                .collect()
-        })
-        .collect()
+    todo!("l12: apply_filterbank")
 }
 
 /// Mel power spectrogram, `[frame][mel band]`, with fmin = 0 and
 /// fmax = Nyquist (librosa's defaults).
 pub fn mel_spectrogram(x: &[f64], sample_rate: u32, cfg: &StftConfig, n_mels: usize) -> Vec<Vec<f64>> {
-    let fb = mel_filterbank(n_mels, cfg.n_fft, sample_rate, 0.0, sample_rate as f64 / 2.0);
-    apply_filterbank(&power_spectrogram(x, cfg), &fb)
+    todo!("l12: mel_spectrogram")
 }
 
 /// DCT-II with orthonormal scaling (scipy's `norm="ortho"`), first `n_out`
@@ -73,30 +52,13 @@ pub fn mel_spectrogram(x: &[f64], sample_rate: u32, cfg: &StftConfig, n_mels: us
 ///     X[k] = s_k · Σ_n x[n] · cos(π·k·(2n + 1) / (2N))
 /// with s_0 = √(1/N) and s_k = √(2/N) for k > 0.
 pub fn dct2(x: &[f64], n_out: usize) -> Vec<f64> {
-    let n = x.len() as f64;
-    (0..n_out)
-        .map(|k| {
-            let sum: f64 = x
-                .iter()
-                .enumerate()
-                .map(|(i, &v)| v * (PI * k as f64 * (2 * i + 1) as f64 / (2.0 * n)).cos())
-                .sum();
-            let scale = if k == 0 { (1.0 / n).sqrt() } else { (2.0 / n).sqrt() };
-            scale * sum
-        })
-        .collect()
+    todo!("l12: dct2")
 }
 
 /// MFCCs, `[frame][coefficient]`: mel spectrogram, then 10·log10 (floor the
 /// power at 1e-10 first), then the DCT of each frame, keeping `n_mfcc`.
 pub fn mfcc(x: &[f64], sample_rate: u32, cfg: &StftConfig, n_mels: usize, n_mfcc: usize) -> Vec<Vec<f64>> {
-    mel_spectrogram(x, sample_rate, cfg, n_mels)
-        .iter()
-        .map(|frame| {
-            let log_mel: Vec<f64> = frame.iter().map(|&p| 10.0 * p.max(1e-10).log10()).collect();
-            dct2(&log_mel, n_mfcc)
-        })
-        .collect()
+    todo!("l12: mfcc")
 }
 
 #[cfg(test)]

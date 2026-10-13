@@ -12,40 +12,34 @@ use crate::level::{amplitude_to_db, rms};
 /// samples, fit in a signal of `n_samples`? (No padding: a partial frame at
 /// the end doesn't count.)
 pub fn num_frames(n_samples: usize, frame_len: usize, hop: usize) -> usize {
-    if n_samples < frame_len { 0 } else { 1 + (n_samples - frame_len) / hop }
+    // Careful: usize can't go negative. `n_samples - frame_len` panics if
+    // n_samples is smaller, so check that case first.
+    todo!("l05: num_frames")
 }
 
 /// Split a signal into overlapping frames. Each frame is a slice that
 /// *borrows* from `x`: no samples are copied.
 pub fn frames(x: &[f64], frame_len: usize, hop: usize) -> Vec<&[f64]> {
-    (0..num_frames(x.len(), frame_len, hop))
-        .map(|i| &x[i * hop..i * hop + frame_len])
-        .collect()
+    // Frame i is `&x[start..end]`. Push each one onto a Vec.
+    todo!("l05: frames")
 }
 
 /// The loudness of each frame: its RMS, in dB.
 pub fn frame_rms_db(x: &[f64], frame_len: usize, hop: usize) -> Vec<f64> {
-    frames(x, frame_len, hop)
-        .iter()
-        .map(|f| amplitude_to_db(rms(f)))
-        .collect()
+    todo!("l05: frame_rms_db")
 }
 
 /// The zero-crossing rate of each frame: crossings divided by frame length.
 /// Noisy sounds like "s" and "f" cross zero far more often than vowels.
 pub fn frame_zcr(x: &[f64], frame_len: usize, hop: usize) -> Vec<f64> {
-    frames(x, frame_len, hop)
-        .iter()
-        .map(|f| zero_crossings(f) as f64 / frame_len as f64)
-        .collect()
+    todo!("l05: frame_zcr")
 }
 
 /// Multiply every sample by `gain`, changing the signal *in place*.
 /// Note the `&mut`: the caller lends you their data and lets you modify it.
 pub fn apply_gain(x: &mut [f64], gain: f64) {
-    for v in x.iter_mut() {
-        *v *= gain;
-    }
+    // `for v in x.iter_mut() { *v = ...; }`: the `*` writes through the reference.
+    todo!("l05: apply_gain")
 }
 
 /// Fade in over the first `fade_len` samples and out over the last
@@ -54,20 +48,14 @@ pub fn apply_gain(x: &mut [f64], gain: f64) {
 /// fade-out mirrors it. If the signal is shorter than two fades, use
 /// `fade_len = len / 2`. Fades stop clicks when audio starts or stops.
 pub fn fade(x: &mut [f64], fade_len: usize) {
-    let n = x.len();
-    let fade_len = fade_len.min(n / 2);
-    for i in 0..fade_len {
-        let g = i as f64 / fade_len as f64;
-        x[i] *= g;
-        x[n - 1 - i] *= g;
-    }
+    todo!("l05: fade")
 }
 
 /// Add two signals sample by sample. If one is longer, its tail is kept.
 pub fn mix(a: &[f64], b: &[f64]) -> Vec<f64> {
-    (0..a.len().max(b.len()))
-        .map(|i| a.get(i).unwrap_or(&0.0) + b.get(i).unwrap_or(&0.0))
-        .collect()
+    // `a.get(i)` returns `Some(&value)` or `None` past the end, and
+    // `.unwrap_or(&0.0)` supplies a default.
+    todo!("l05: mix")
 }
 
 /// Cut silence from the start and end, like `librosa.effects.trim`.
@@ -80,13 +68,9 @@ pub fn mix(a: &[f64], b: &[f64]) -> Vec<f64> {
 /// The return type `&[f64]` borrows from `x`, so the trimmed audio is not
 /// copied. Rust works out that the output borrows from the only input reference.
 pub fn trim_silence(x: &[f64], frame_len: usize, hop: usize, top_db: f64) -> &[f64] {
-    let db = frame_rms_db(x, frame_len, hop);
-    let loudest = db.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-    let is_loud = |v: &f64| *v > loudest - top_db;
-    match (db.iter().position(is_loud), db.iter().rposition(is_loud)) {
-        (Some(first), Some(last)) => &x[first * hop..(last * hop + frame_len).min(x.len())],
-        _ => &x[0..0],
-    }
+    // `.position(|v| ...)` finds the first index where a condition holds;
+    // `.rposition(...)` finds the last. Both return an Option.
+    todo!("l05: trim_silence")
 }
 
 #[cfg(test)]

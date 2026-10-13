@@ -26,32 +26,32 @@ impl Complex {
 
     /// From polar form: length `r`, angle `theta` radians.
     pub fn from_polar(r: f64, theta: f64) -> Self {
-        Complex::new(r * theta.cos(), r * theta.sin())
+        todo!("l08: Complex::from_polar")
     }
 
     /// e^(jθ) = cos θ + j·sin θ: the point at angle θ on the unit circle.
     pub fn expj(theta: f64) -> Self {
-        Complex::from_polar(1.0, theta)
+        todo!("l08: Complex::expj")
     }
 
     /// Magnitude |z|, the distance from 0. (`f64::hypot` is your friend.)
     pub fn abs(self) -> f64 {
-        self.re.hypot(self.im)
+        todo!("l08: Complex::abs")
     }
 
     /// |z|², which is cheaper than abs() (no square root). It's the *power*.
     pub fn norm_sqr(self) -> f64 {
-        self.re * self.re + self.im * self.im
+        todo!("l08: Complex::norm_sqr")
     }
 
     /// The angle (phase) in radians, from −π to π. Use `f64::atan2`.
     pub fn arg(self) -> f64 {
-        self.im.atan2(self.re)
+        todo!("l08: Complex::arg")
     }
 
     /// Complex conjugate: re − im·j.
     pub fn conj(self) -> Self {
-        Complex::new(self.re, -self.im)
+        todo!("l08: Complex::conj")
     }
 }
 
@@ -67,7 +67,7 @@ impl Add for Complex {
 impl Sub for Complex {
     type Output = Complex;
     fn sub(self, rhs: Complex) -> Complex {
-        Complex::new(self.re - rhs.re, self.im - rhs.im)
+        todo!("l08: Complex - Complex")
     }
 }
 
@@ -75,7 +75,7 @@ impl Sub for Complex {
 impl Mul for Complex {
     type Output = Complex;
     fn mul(self, rhs: Complex) -> Complex {
-        Complex::new(self.re * rhs.re - self.im * rhs.im, self.re * rhs.im + self.im * rhs.re)
+        todo!("l08: Complex * Complex")
     }
 }
 
@@ -83,15 +83,15 @@ impl Mul for Complex {
 impl Mul<f64> for Complex {
     type Output = Complex;
     fn mul(self, rhs: f64) -> Complex {
-        Complex::new(self.re * rhs, self.im * rhs)
+        todo!("l08: Complex * f64")
     }
 }
 
 /// `a += b`, handy for running sums.
 impl AddAssign for Complex {
     fn add_assign(&mut self, rhs: Complex) {
-        self.re += rhs.re;
-        self.im += rhs.im;
+        // `self` is `&mut Complex` here: change its fields directly.
+        todo!("l08: Complex += Complex")
     }
 }
 

@@ -15,42 +15,24 @@ use std::f64::consts::PI;
 ///     X[k + N/2] = E[k] − W·O[k]
 /// The recursion stops at N = 1, where the FFT of one sample is itself.
 pub fn fft(x: &[Complex]) -> Vec<Complex> {
-    let n = x.len();
-    assert!(n.is_power_of_two(), "fft length must be a power of two, got {n}");
-    if n == 1 {
-        return vec![x[0]];
-    }
-    let even: Vec<Complex> = x.iter().step_by(2).copied().collect();
-    let odd: Vec<Complex> = x.iter().skip(1).step_by(2).copied().collect();
-    let (e, o) = (fft(&even), fft(&odd));
-    let mut out = vec![Complex::ZERO; n];
-    for k in 0..n / 2 {
-        let t = Complex::expj(-2.0 * PI * k as f64 / n as f64) * o[k];
-        out[k] = e[k] + t;
-        out[k + n / 2] = e[k] - t;
-    }
-    out
+    // Start by checking the length with `assert!(condition, "message")`. The
+    // test expects the message to contain the words "power of two".
+    // `x.iter().step_by(2).copied().collect::<Vec<_>>()` gives the even samples;
+    // add `.skip(1)` before `.step_by(2)` for the odd ones.
+    todo!("l09: fft")
 }
 
 /// Inverse FFT, by the conjugation trick: ifft(X) = conj(fft(conj(X))) / N.
 /// No new algorithm needed.
 pub fn ifft(spectrum: &[Complex]) -> Vec<Complex> {
-    let scale = 1.0 / spectrum.len() as f64;
-    let conjugated: Vec<Complex> = spectrum.iter().map(|c| c.conj()).collect();
-    fft(&conjugated).iter().map(|c| c.conj() * scale).collect()
+    todo!("l09: ifft")
 }
 
 /// FFT of a real signal, padded with zeros (or cut) to `n_fft` samples,
 /// returning only bins 0 ..= n_fft/2. This is what `np.fft.rfft` does, and
 /// what the STFT will call for every frame.
 pub fn rfft(x: &[f64], n_fft: usize) -> Vec<Complex> {
-    let mut buf = vec![Complex::ZERO; n_fft];
-    for (b, &v) in buf.iter_mut().zip(x) {
-        *b = Complex::new(v, 0.0);
-    }
-    let mut spec = fft(&buf);
-    spec.truncate(n_fft / 2 + 1);
-    spec
+    todo!("l09: rfft")
 }
 
 #[cfg(test)]

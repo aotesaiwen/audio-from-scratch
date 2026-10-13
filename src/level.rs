@@ -18,33 +18,28 @@ pub fn peak(x: &[f64]) -> f64 {
 /// It's the "average size" of a signal, and tracks perceived loudness far
 /// better than the peak. Empty signal: 0.0.
 pub fn rms(x: &[f64]) -> f64 {
-    if x.is_empty() {
-        return 0.0;
-    }
-    (x.iter().map(|v| v * v).sum::<f64>() / x.len() as f64).sqrt()
+    // `.sum::<f64>()` adds up an iterator. The `::<f64>` tells Rust what type
+    // the total should be.
+    todo!("l03: rms")
 }
 
 /// An amplitude ratio in decibels: 20 · log10(a).
 /// 1.0 is 0 dB, 0.5 is about −6 dB, 0.1 is −20 dB.
 /// log10(0) is −infinity, so floor the input at 1e-10 (−200 dB) first.
 pub fn amplitude_to_db(a: f64) -> f64 {
-    20.0 * a.max(1e-10).log10()
+    todo!("l03: amplitude_to_db")
 }
 
 /// The inverse of `amplitude_to_db`: 10^(db / 20).
 pub fn db_to_amplitude(db: f64) -> f64 {
-    10f64.powf(db / 20.0)
+    todo!("l03: db_to_amplitude")
 }
 
 /// Scale the signal so its peak sits at `target_db` dBFS (0 dB = full scale).
 /// A silent signal is returned unchanged; don't divide by zero.
 pub fn normalize_peak(x: &[f64], target_db: f64) -> Vec<f64> {
-    let p = peak(x);
-    if p == 0.0 {
-        return x.to_vec();
-    }
-    let gain = db_to_amplitude(target_db) / p;
-    x.iter().map(|v| v * gain).collect()
+    // `.collect()` turns an iterator back into a Vec.
+    todo!("l03: normalize_peak")
 }
 
 /// Simulate storing the signal with `bits` bits per sample.
@@ -53,20 +48,16 @@ pub fn normalize_peak(x: &[f64], target_db: f64) -> Vec<f64> {
 /// Scale by that, round to a whole number, clamp to the representable range
 /// [−2^(bits−1), 2^(bits−1) − 1], then scale back down.
 pub fn quantize(x: &[f64], bits: u32) -> Vec<f64> {
-    let levels = 2f64.powi(bits as i32 - 1);
-    x.iter()
-        .map(|&v| (v * levels).round().clamp(-levels, levels - 1.0) / levels)
-        .collect()
+    // `2f64.powi(n)` raises 2.0 to an integer power n (an i32).
+    todo!("l03: quantize")
 }
 
 /// Signal-to-noise ratio in dB, treating `clean − degraded` as the noise:
 /// 10 · log10( Σ clean² / Σ (clean − degraded)² ).
 /// (10, not 20, because these are powers, i.e. squared amplitudes.)
 pub fn snr_db(clean: &[f64], degraded: &[f64]) -> f64 {
-    assert_eq!(clean.len(), degraded.len(), "snr_db: signals differ in length");
-    let signal: f64 = clean.iter().map(|v| v * v).sum();
-    let noise: f64 = clean.iter().zip(degraded).map(|(c, d)| (c - d).powi(2)).sum();
-    10.0 * (signal / noise.max(1e-300)).log10()
+    // `.zip()` walks two iterators side by side, giving you pairs.
+    todo!("l03: snr_db")
 }
 
 #[cfg(test)]

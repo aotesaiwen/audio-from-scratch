@@ -14,44 +14,35 @@ pub fn rectangular(n: usize) -> Vec<f64> {
 /// ("Periodic" divides by n, not n − 1. That's the version for spectral
 /// analysis, and what librosa uses.)
 pub fn hann(n: usize) -> Vec<f64> {
-    (0..n).map(|i| 0.5 - 0.5 * (2.0 * PI * i as f64 / n as f64).cos()).collect()
+    todo!("l10: hann")
 }
 
 /// The Hamming window, periodic form: w[i] = 0.54 − 0.46·cos(2π·i/n).
 pub fn hamming(n: usize) -> Vec<f64> {
-    (0..n).map(|i| 0.54 - 0.46 * (2.0 * PI * i as f64 / n as f64).cos()).collect()
+    todo!("l10: hamming")
 }
 
 /// Multiply a frame by a window, sample by sample. Panics if the lengths differ.
 pub fn apply_window(x: &[f64], w: &[f64]) -> Vec<f64> {
-    assert_eq!(x.len(), w.len(), "frame and window lengths differ");
-    x.iter().zip(w).map(|(a, b)| a * b).collect()
+    todo!("l10: apply_window")
 }
 
 /// The mean of the window. A windowed sine's spectral peak is this much
 /// smaller than an unwindowed one's (0.5 for Hann).
 pub fn coherent_gain(w: &[f64]) -> f64 {
-    w.iter().sum::<f64>() / w.len() as f64
+    todo!("l10: coherent_gain")
 }
 
 /// How badly a single tone has leaked across the spectrum: the biggest
 /// magnitude more than `guard` bins away from the peak, relative to the
 /// peak, in dB. −20 dB means bad leakage; −100 dB means essentially none.
 pub fn max_sidelobe_db(magnitudes: &[f64], guard: usize) -> f64 {
-    let (peak_bin, peak) = magnitudes
-        .iter()
-        .copied()
-        .enumerate()
-        .max_by(|a, b| a.1.total_cmp(&b.1))
-        .expect("empty spectrum");
-    let (lo, hi) = (peak_bin.saturating_sub(guard), peak_bin + guard);
-    let worst = magnitudes
-        .iter()
-        .enumerate()
-        .filter(|&(i, _)| i < lo || i > hi)
-        .map(|(_, &m)| m)
-        .fold(0.0, f64::max);
-    amplitude_to_db(worst / peak)
+    // 1. Find the peak bin and its value.
+    // 2. Find the largest value at bins i with i < peak − guard or
+    //    i > peak + guard. (Careful: `peak − guard` on usize can underflow.
+    //    `peak.saturating_sub(guard)` stops at 0.)
+    // 3. Return amplitude_to_db(that / peak).
+    todo!("l10: max_sidelobe_db")
 }
 
 #[cfg(test)]

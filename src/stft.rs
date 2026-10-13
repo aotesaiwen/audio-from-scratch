@@ -24,57 +24,39 @@ pub struct StftConfig {
 /// fields: `StftConfig { n_fft: 512, ..Default::default() }`.
 impl Default for StftConfig {
     fn default() -> Self {
-        StftConfig { n_fft: 2048, hop_length: 512, center: true }
+        // Use librosa's defaults: n_fft 2048, hop_length 512, center true.
+        todo!("l11: StftConfig::default")
     }
 }
 
 /// The short-time Fourier transform: for each frame, multiply by a Hann
 /// window and take the rfft. Returns `[frame][bin]`, n_fft/2 + 1 bins per frame.
 pub fn stft(x: &[f64], cfg: &StftConfig) -> Vec<Vec<Complex>> {
-    let signal: Vec<f64> = if cfg.center {
-        let pad = vec![0.0; cfg.n_fft / 2];
-        [pad.as_slice(), x, pad.as_slice()].concat()
-    } else {
-        x.to_vec()
-    };
-    let window = hann(cfg.n_fft);
-    frames(&signal, cfg.n_fft, cfg.hop_length)
-        .iter()
-        .map(|frame| rfft(&apply_window(frame, &window), cfg.n_fft))
-        .collect()
+    // If cfg.center, build a padded copy first: n_fft/2 zeros, x, n_fft/2 zeros.
+    todo!("l11: stft")
 }
 
 /// |STFT|²: the power spectrogram, `[frame][bin]`.
 pub fn power_spectrogram(x: &[f64], cfg: &StftConfig) -> Vec<Vec<f64>> {
-    stft(x, cfg)
-        .iter()
-        .map(|frame| frame.iter().map(|c| c.norm_sqr()).collect())
-        .collect()
+    todo!("l11: power_spectrogram")
 }
 
 /// Power to decibels, like `librosa.power_to_db(S, ref=np.max, top_db=...)`:
 /// 10·log10(p / max), so the loudest cell is 0 dB, then anything below
 /// −top_db is raised to −top_db. Floor p at 1e-10 before taking the log.
 pub fn power_to_db(spec: &[Vec<f64>], top_db: f64) -> Vec<Vec<f64>> {
-    let max = spec.iter().flatten().copied().fold(1e-10, f64::max);
-    let ref_db = 10.0 * max.log10();
-    spec.iter()
-        .map(|row| {
-            row.iter()
-                .map(|&p| (10.0 * p.max(1e-10).log10() - ref_db).max(-top_db))
-                .collect()
-        })
-        .collect()
+    // `spec.iter().flatten()` walks every value in every row.
+    todo!("l11: power_to_db")
 }
 
 /// The time (s) each frame is centred on (assuming `center: true`).
 pub fn frame_times(n_frames: usize, hop_length: usize, sample_rate: u32) -> Vec<f64> {
-    (0..n_frames).map(|i| (i * hop_length) as f64 / sample_rate as f64).collect()
+    todo!("l11: frame_times")
 }
 
 /// The frequency (Hz) of each of the n_fft/2 + 1 bins.
 pub fn bin_frequencies(n_fft: usize, sample_rate: u32) -> Vec<f64> {
-    (0..=n_fft / 2).map(|k| k as f64 * sample_rate as f64 / n_fft as f64).collect()
+    todo!("l11: bin_frequencies")
 }
 
 #[cfg(test)]

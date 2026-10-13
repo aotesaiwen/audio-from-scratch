@@ -19,7 +19,7 @@ pub struct CyclePeak {
 
 /// Index of the largest value. Panics on an empty slice.
 pub fn argmax(x: &[f64]) -> usize {
-    (0..x.len()).max_by(|&a, &b| x[a].total_cmp(&x[b])).expect("argmax of empty slice")
+    todo!("l14: argmax")
 }
 
 /// Find one peak per glottal cycle in a sustained vowel whose F0 is about
@@ -38,41 +38,17 @@ pub fn argmax(x: &[f64]) -> usize {
 ///
 /// Returns no peaks if the signal is shorter than 2·T.
 pub fn find_cycle_peaks(x: &[f64], sample_rate: u32, f0: f64) -> Vec<CyclePeak> {
-    let sr = sample_rate as f64;
-    let period = sr / f0;
-    let mut peaks = Vec::new();
-    if (x.len() as f64) < 2.0 * period {
-        return peaks;
-    }
-    let mut i = argmax(&x[..period as usize]);
-    while i + 1 < x.len() && x[i + 1] > x[i] {
-        i += 1;
-    }
-    loop {
-        let (pos, amp) = parabolic_peak(x, i);
-        peaks.push(CyclePeak { time: pos / sr, amplitude: amp });
-        let lo = i + (0.7 * period) as usize;
-        let hi = (i as f64 + 1.3 * period).ceil() as usize;
-        if hi >= x.len() {
-            break;
-        }
-        let j = argmax(&x[lo..=hi]);
-        if j == 0 || j == hi - lo {
-            break;
-        }
-        i = lo + j;
-    }
-    peaks
+    todo!("l14: find_cycle_peaks")
 }
 
 /// Time between consecutive peaks (seconds): one fewer than there are peaks.
 pub fn periods(peaks: &[CyclePeak]) -> Vec<f64> {
-    peaks.windows(2).map(|w| w[1].time - w[0].time).collect()
+    todo!("l14: periods")
 }
 
 /// The peak amplitude of each cycle.
 pub fn amplitudes(peaks: &[CyclePeak]) -> Vec<f64> {
-    peaks.iter().map(|p| p.amplitude).collect()
+    todo!("l14: amplitudes")
 }
 
 /// Which periods Praat trusts. These are the three mystery numbers in
@@ -114,20 +90,13 @@ fn mean(xs: &[f64]) -> f64 {
 /// Jitter (local, absolute), in seconds: the mean of |T[i] − T[i+1]| over
 /// neighbouring pairs that pass `limits.pair_ok`. None if no pair passes.
 pub fn jitter_local_absolute(periods: &[f64], limits: &PeriodLimits) -> Option<f64> {
-    let diffs: Vec<f64> = periods
-        .windows(2)
-        .filter(|w| limits.pair_ok(w[0], w[1]))
-        .map(|w| (w[0] - w[1]).abs())
-        .collect();
-    if diffs.is_empty() { None } else { Some(mean(&diffs)) }
+    todo!("l14: jitter_local_absolute")
 }
 
 /// Jitter (local), as a fraction (×100 for Praat's %): jitter (local,
 /// absolute) divided by the mean of the *valid* periods.
 pub fn jitter_local(periods: &[f64], limits: &PeriodLimits) -> Option<f64> {
-    let absolute = jitter_local_absolute(periods, limits)?;
-    let valid: Vec<f64> = periods.iter().copied().filter(|&t| limits.is_valid(t)).collect();
-    Some(absolute / mean(&valid))
+    todo!("l14: jitter_local")
 }
 
 /// Jitter (RAP, "relative average perturbation"): for each period with a
@@ -137,16 +106,7 @@ pub fn jitter_local(periods: &[f64], limits: &PeriodLimits) -> Option<f64> {
 /// (Praat's "ddp" jitter is exactly 3 × RAP: a different number with the
 /// same information.)
 pub fn jitter_rap(periods: &[f64], limits: &PeriodLimits) -> Option<f64> {
-    let devs: Vec<f64> = periods
-        .windows(3)
-        .filter(|w| limits.pair_ok(w[0], w[1]) && limits.pair_ok(w[1], w[2]))
-        .map(|w| (w[1] - (w[0] + w[1] + w[2]) / 3.0).abs())
-        .collect();
-    if devs.is_empty() {
-        return None;
-    }
-    let valid: Vec<f64> = periods.iter().copied().filter(|&t| limits.is_valid(t)).collect();
-    Some(mean(&devs) / mean(&valid))
+    todo!("l14: jitter_rap")
 }
 
 /// Can two neighbouring amplitudes be compared? The bigger must be at most
@@ -158,22 +118,13 @@ fn amp_pair_ok(a: f64, b: f64, max_factor: f64) -> bool {
 /// Shimmer (local), as a fraction: mean |A[i] − A[i+1]| over neighbouring
 /// pairs passing the amplitude-factor check, divided by the mean amplitude.
 pub fn shimmer_local(amps: &[f64], max_factor: f64) -> Option<f64> {
-    let diffs: Vec<f64> = amps
-        .windows(2)
-        .filter(|w| amp_pair_ok(w[0], w[1], max_factor))
-        .map(|w| (w[0] - w[1]).abs())
-        .collect();
-    if diffs.is_empty() { None } else { Some(mean(&diffs) / mean(amps)) }
+    // The private helper `amp_pair_ok` above is yours to use.
+    todo!("l14: shimmer_local")
 }
 
 /// Shimmer (local, dB): mean |20·log10(A[i+1] / A[i])| over valid pairs.
 pub fn shimmer_local_db(amps: &[f64], max_factor: f64) -> Option<f64> {
-    let dbs: Vec<f64> = amps
-        .windows(2)
-        .filter(|w| amp_pair_ok(w[0], w[1], max_factor))
-        .map(|w| (20.0 * (w[1] / w[0]).log10()).abs())
-        .collect();
-    if dbs.is_empty() { None } else { Some(mean(&dbs)) }
+    todo!("l14: shimmer_local_db")
 }
 
 /// Shimmer (APQ3): RAP's idea applied to amplitudes. For each amplitude
@@ -181,12 +132,7 @@ pub fn shimmer_local_db(amps: &[f64], max_factor: f64) -> Option<f64> {
 /// the mean of those, divided by the mean amplitude.
 /// (Praat's "dda" shimmer is exactly 3 × APQ3.)
 pub fn shimmer_apq3(amps: &[f64], max_factor: f64) -> Option<f64> {
-    let devs: Vec<f64> = amps
-        .windows(3)
-        .filter(|w| amp_pair_ok(w[0], w[1], max_factor) && amp_pair_ok(w[1], w[2], max_factor))
-        .map(|w| (w[1] - (w[0] + w[1] + w[2]) / 3.0).abs())
-        .collect();
-    if devs.is_empty() { None } else { Some(mean(&devs) / mean(amps)) }
+    todo!("l14: shimmer_apq3")
 }
 
 /// Harmonics-to-noise ratio (dB), averaged over voiced frames.
@@ -197,17 +143,7 @@ pub fn shimmer_apq3(amps: &[f64], max_factor: f64) -> Option<f64> {
 ///     HNR = 10 · log10(r / (1 − r))        (Boersma, 1993)
 /// Clamp r into [1e-9, 1 − 1e-9] first. None if no frame is voiced.
 pub fn hnr_db(x: &[f64], sample_rate: u32, cfg: &PitchConfig) -> Option<f64> {
-    let frame_len = (cfg.frame_seconds * sample_rate as f64).round() as usize;
-    let hop = ((cfg.hop_seconds * sample_rate as f64).round() as usize).max(1);
-    let values: Vec<f64> = frames(x, frame_len, hop)
-        .iter()
-        .filter_map(|f| periodicity(f, sample_rate, cfg))
-        .map(|(_, r)| {
-            let r = r.clamp(1e-9, 1.0 - 1e-9);
-            10.0 * (r / (1.0 - r)).log10()
-        })
-        .collect();
-    if values.is_empty() { None } else { Some(mean(&values)) }
+    todo!("l14: hnr_db")
 }
 
 /// A Praat-style voice report.
@@ -231,15 +167,9 @@ pub struct VoiceReport {
 /// percentages for the fractions, and microseconds for absolute jitter.
 impl fmt::Display for VoiceReport {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "Mean F0:                 {:8.2} Hz", self.mean_f0)?;
-        writeln!(f, "Std F0:                  {:8.2} Hz", self.std_f0)?;
-        writeln!(f, "Jitter (local):          {:8.3} %", 100.0 * self.jitter_local)?;
-        writeln!(f, "Jitter (local, abs):     {:8.2} µs", 1e6 * self.jitter_local_absolute)?;
-        writeln!(f, "Jitter (rap):            {:8.3} %", 100.0 * self.jitter_rap)?;
-        writeln!(f, "Shimmer (local):         {:8.3} %", 100.0 * self.shimmer_local)?;
-        writeln!(f, "Shimmer (local, dB):     {:8.3} dB", self.shimmer_local_db)?;
-        writeln!(f, "Shimmer (apq3):          {:8.3} %", 100.0 * self.shimmer_apq3)?;
-        write!(f, "HNR:                     {:8.2} dB", self.hnr_db)
+        // `writeln!(f, "Mean F0:  {:.2} Hz", self.mean_f0)?;` writes one line.
+        // The `?` passes any formatting error on. End with `Ok(())`.
+        todo!("l14: Display for VoiceReport")
     }
 }
 
@@ -254,27 +184,7 @@ impl fmt::Display for VoiceReport {
 ///
 /// Any measure that comes out None makes the whole report None (`?`).
 pub fn analyze(audio: &Audio, cfg: &PitchConfig) -> Option<VoiceReport> {
-    let sr = audio.sample_rate;
-    let (mean_f0, std_f0) = mean_and_std(&pitch_track(&audio.samples, sr, cfg))?;
-
-    let max = audio.samples.iter().copied().fold(0.0, f64::max);
-    let min = audio.samples.iter().copied().fold(0.0, f64::min);
-    let x: Vec<f64> = if -min > max { audio.samples.iter().map(|v| -v).collect() } else { audio.samples.clone() };
-
-    let peaks = find_cycle_peaks(&x, sr, mean_f0);
-    let (t, a) = (periods(&peaks), amplitudes(&peaks));
-    let limits = PeriodLimits::default();
-    Some(VoiceReport {
-        mean_f0,
-        std_f0,
-        jitter_local: jitter_local(&t, &limits)?,
-        jitter_local_absolute: jitter_local_absolute(&t, &limits)?,
-        jitter_rap: jitter_rap(&t, &limits)?,
-        shimmer_local: shimmer_local(&a, 1.6)?,
-        shimmer_local_db: shimmer_local_db(&a, 1.6)?,
-        shimmer_apq3: shimmer_apq3(&a, 1.6)?,
-        hnr_db: hnr_db(&x, sr, cfg)?,
-    })
+    todo!("l14: analyze")
 }
 
 #[cfg(test)]

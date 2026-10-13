@@ -28,55 +28,25 @@ use std::f64::consts::PI;
 ///     a[i] = k
 ///     err  = err · (1 − k²)
 pub fn levinson_durbin(r: &[f64], order: usize) -> (Vec<f64>, f64) {
-    let mut a = vec![0.0; order + 1];
-    a[0] = 1.0;
-    let mut err = r[0];
-    if err <= 0.0 {
-        return (a, 0.0);
-    }
-    for i in 1..=order {
-        let mut acc = r[i];
-        for j in 1..i {
-            acc += a[j] * r[i - j];
-        }
-        let k = -acc / err;
-        let old = a.clone();
-        for j in 1..i {
-            a[j] = old[j] + k * old[i - j];
-        }
-        a[i] = k;
-        err *= 1.0 - k * k;
-        if err <= 0.0 {
-            break;
-        }
-    }
-    (a, err)
+    todo!("l16: levinson_durbin")
 }
 
 /// LPC coefficients of a frame (autocorrelation method).
 pub fn lpc(frame: &[f64], order: usize) -> Vec<f64> {
-    levinson_durbin(&autocorrelation(frame, order), order).0
+    todo!("l16: lpc")
 }
 
 /// The prediction error (the "residual", or excitation): filter x through
 /// A(z), an FIR filter whose taps are the LPC coefficients themselves.
 pub fn residual(x: &[f64], a: &[f64]) -> Vec<f64> {
-    fir_filter(x, a)
+    todo!("l16: residual")
 }
 
 /// Undo `residual`: run e through the all-pole filter 1/A(z),
 ///     y[n] = e[n] − Σ_{j=1}^{p} a[j] · y[n − j]
 /// (skipping terms with n − j < 0).
 pub fn synthesize(e: &[f64], a: &[f64]) -> Vec<f64> {
-    let mut y = vec![0.0; e.len()];
-    for n in 0..e.len() {
-        let mut v = e[n];
-        for j in 1..a.len().min(n + 1) {
-            v -= a[j] * y[n - j];
-        }
-        y[n] = v;
-    }
-    y
+    todo!("l16: synthesize")
 }
 
 /// Given: evaluate the polynomial z^p + a[1]·z^(p−1) + ... + a[p] at z
@@ -96,48 +66,17 @@ pub fn eval_poly(a: &[f64], z: Complex) -> Complex {
 /// until nothing moves more than 1e-12 (or 500 rounds have passed).
 /// Start from z_i = (0.4 + 0.9j)^i, i = 0 .. p−1.
 pub fn poly_roots(a: &[f64]) -> Vec<Complex> {
-    let p = a.len() - 1;
-    let seed = Complex::new(0.4, 0.9);
-    let mut roots = Vec::with_capacity(p);
-    let mut z = Complex::new(1.0, 0.0);
-    for _ in 0..p {
-        roots.push(z);
-        z = z * seed;
-    }
-    for _ in 0..500 {
-        let mut biggest_step: f64 = 0.0;
-        for i in 0..p {
-            let mut denom = Complex::new(1.0, 0.0);
-            for j in 0..p {
-                if j != i {
-                    denom = denom * (roots[i] - roots[j]);
-                }
-            }
-            let step = eval_poly(a, roots[i]) / denom;
-            roots[i] = roots[i] - step;
-            biggest_step = biggest_step.max(step.abs());
-        }
-        if biggest_step < 1e-12 {
-            break;
-        }
-    }
-    roots
+    // `Complex / Complex` is implemented for you (in complex.rs).
+    todo!("l16: poly_roots")
 }
 
 /// Multiply out Π (z − root) and return the real parts of the coefficients,
 /// highest power first (so a[0] = 1). Inverse of `poly_roots` for real
 /// polynomials, whose complex roots come in conjugate pairs.
 pub fn poly_from_roots(roots: &[Complex]) -> Vec<f64> {
-    let mut c = vec![Complex::new(1.0, 0.0)];
-    for &r in roots {
-        let mut next = vec![Complex::ZERO; c.len() + 1];
-        for (k, &ck) in c.iter().enumerate() {
-            next[k] += ck;
-            next[k + 1] = next[k + 1] - r * ck;
-        }
-        c = next;
-    }
-    c.iter().map(|v| v.re).collect()
+    // Start from [1] and multiply by (z − r) one root at a time. Multiplying
+    // a polynomial c by (z − r) gives new[k] = c[k] − r·c[k−1].
+    todo!("l16: poly_from_roots")
 }
 
 /// The McAdams transformation: move every complex pole's angle φ (its
@@ -146,18 +85,7 @@ pub fn poly_from_roots(roots: &[Complex]) -> Vec<f64> {
 /// at most π. For a pole below the real axis, φ is negative: use −(|φ|^alpha),
 /// so conjugate pairs stay conjugate. alpha = 1 changes nothing.
 pub fn mcadams(a: &[f64], alpha: f64) -> Vec<f64> {
-    let moved: Vec<Complex> = poly_roots(a)
-        .into_iter()
-        .map(|z| {
-            if z.im.abs() <= 1e-9 {
-                return z;
-            }
-            let phi = z.arg();
-            let new_phi = phi.abs().powf(alpha).min(PI) * phi.signum();
-            Complex::from_polar(z.abs(), new_phi)
-        })
-        .collect();
-    poly_from_roots(&moved)
+    todo!("l16: mcadams")
 }
 
 /// Anonymise speech with the standard McAdams recipe:
@@ -169,30 +97,7 @@ pub fn mcadams(a: &[f64], alpha: f64) -> Vec<f64> {
 ///   into the output at the frame's position
 /// - finally scale the whole output so its peak is 1 (if it isn't silent).
 pub fn mcadams_anonymize(x: &[f64], sample_rate: u32, alpha: f64) -> Vec<f64> {
-    let sr = sample_rate as f64;
-    let frame_len = (0.02 * sr) as usize;
-    let hop = (0.01 * sr) as usize;
-    let h = hann(frame_len);
-    let k = h.iter().sum::<f64>() / hop as f64;
-    let w: Vec<f64> = h.iter().map(|v| (v / k).sqrt()).collect();
-    let mut out = vec![0.0; x.len()];
-    for f in 0..num_frames(x.len(), frame_len, hop) {
-        let start = f * hop;
-        let frame: Vec<f64> = x[start..start + frame_len].iter().zip(&w).map(|(s, wv)| s * wv).collect();
-        let a = lpc(&frame, 20);
-        let e = residual(&frame, &a);
-        let y = synthesize(&e, &mcadams(&a, alpha));
-        for (i, (v, wv)) in y.iter().zip(&w).enumerate() {
-            out[start + i] += v * wv;
-        }
-    }
-    let p = peak(&out);
-    if p > 0.0 {
-        for v in out.iter_mut() {
-            *v /= p;
-        }
-    }
-    out
+    todo!("l16: mcadams_anonymize")
 }
 
 #[cfg(test)]

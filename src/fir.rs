@@ -8,46 +8,34 @@ use crate::signal::sine;
 /// Full convolution: y[n] = Σ_k h[k] · x[n − k].
 /// The output has `x.len() + h.len() − 1` samples. Empty input: empty output.
 pub fn convolve(x: &[f64], h: &[f64]) -> Vec<f64> {
-    if x.is_empty() || h.is_empty() {
-        return Vec::new();
-    }
-    let mut y = vec![0.0; x.len() + h.len() - 1];
-    // Each input sample adds a scaled copy of h, starting at its own position.
-    for (n, &xn) in x.iter().enumerate() {
-        for (k, &hk) in h.iter().enumerate() {
-            y[n + k] += xn * hk;
-        }
-    }
-    y
+    // Read the README section on the two ways to write this loop. One of
+    // them needs `n - k` on usizes, which panics when k > n.
+    todo!("l06: convolve")
 }
 
 /// Filter `x` through the FIR filter `h`, keeping the output the same length
 /// as the input (the first `x.len()` samples of the full convolution).
 pub fn fir_filter(x: &[f64], h: &[f64]) -> Vec<f64> {
-    let mut y = convolve(x, h);
-    y.truncate(x.len());
-    y
+    todo!("l06: fir_filter")
 }
 
 /// An n-tap moving average: n copies of 1/n.
 pub fn moving_average_kernel(n: usize) -> Vec<f64> {
-    vec![1.0 / n as f64; n]
+    todo!("l06: moving_average_kernel")
 }
 
 /// Pre-emphasis: y[n] = x[n] − alpha · x[n−1], with y[0] = x[0].
 /// The first step of classic MFCC and LPC pipelines (alpha ≈ 0.97). It
 /// boosts the high frequencies, which voiced speech is weak in.
 pub fn pre_emphasis(x: &[f64], alpha: f64) -> Vec<f64> {
-    fir_filter(x, &[1.0, -alpha])
+    // This is just an FIR filter. What is its kernel h?
+    todo!("l06: pre_emphasis")
 }
 
 /// The impulse response of a single echo: the original sound, then a copy
 /// `delay_samples` later, scaled by `decay`. Length `delay_samples + 1`.
 pub fn echo_kernel(delay_samples: usize, decay: f64) -> Vec<f64> {
-    let mut h = vec![0.0; delay_samples + 1];
-    h[0] = 1.0;
-    h[delay_samples] += decay;
-    h
+    todo!("l06: echo_kernel")
 }
 
 /// Measure a filter's gain (dB) at one frequency, by experiment: play a
@@ -57,10 +45,8 @@ pub fn echo_kernel(delay_samples: usize, decay: f64) -> Vec<f64> {
 /// `filter` can be any function or closure that takes a signal and returns
 /// a signal: `measure_gain_db(|x| fir_filter(x, &h), 1000.0, 16_000)`.
 pub fn measure_gain_db(filter: impl Fn(&[f64]) -> Vec<f64>, freq: f64, sample_rate: u32) -> f64 {
-    let x = sine(freq, 0.5, sample_rate, 0.5);
-    let y = filter(&x);
-    let (start, end) = (x.len() / 2, x.len().min(y.len()));
-    amplitude_to_db(rms(&y[start..end]) / rms(&x[start..end]))
+    // Call the closure like a function: `let y = filter(&x);`
+    todo!("l06: measure_gain_db")
 }
 
 #[cfg(test)]

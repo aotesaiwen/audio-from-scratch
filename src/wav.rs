@@ -18,48 +18,35 @@ impl Audio {
 
     /// Length in seconds.
     pub fn duration(&self) -> f64 {
-        self.samples.len() as f64 / self.sample_rate as f64
+        // Inside a method, `self` is the Audio, so `self.samples.len()` works.
+        todo!("l02: Audio::duration")
     }
 }
 
 /// Float sample to 16-bit integer: scale [-1, 1] up to [-32767, 32767] and
 /// round. Values outside [-1, 1] are clipped to the limit first.
 pub fn f64_to_i16(x: f64) -> i16 {
-    (x.clamp(-1.0, 1.0) * 32767.0).round() as i16
+    // f64 has `.clamp(lo, hi)` and `.round()`. Then `as i16`.
+    todo!("l02: f64_to_i16")
 }
 
 /// 16-bit integer to float: divide by 32768, giving values in [-1, 1).
 /// (librosa and soundfile use this same convention.)
 pub fn i16_to_f64(s: i16) -> f64 {
-    s as f64 / 32768.0
+    todo!("l02: i16_to_f64")
 }
 
 /// Encode audio as a complete 16-bit PCM mono WAV file: a 44-byte header
 /// followed by every sample as two little-endian bytes.
 pub fn encode_wav(audio: &Audio) -> Vec<u8> {
-    let bytes_per_sample = 2u32;
-    let data_size = audio.samples.len() as u32 * bytes_per_sample;
-    let mut out = Vec::with_capacity(44 + data_size as usize);
-    // RIFF header: "this is a RIFF file of N more bytes, and it's a WAVE"
+    // The first 12 bytes are written for you as a worked example. Follow the
+    // byte table in lessons/02-wav-files/README.md for the rest.
+    let data_size = (audio.samples.len() * 2) as u32;
+    let mut out: Vec<u8> = Vec::new();
     out.extend_from_slice(b"RIFF");
     out.extend_from_slice(&(36 + data_size).to_le_bytes());
     out.extend_from_slice(b"WAVE");
-    // fmt chunk: how to interpret the samples
-    out.extend_from_slice(b"fmt ");
-    out.extend_from_slice(&16u32.to_le_bytes()); // size of the rest of this chunk
-    out.extend_from_slice(&1u16.to_le_bytes()); // format 1 = integer PCM
-    out.extend_from_slice(&1u16.to_le_bytes()); // channels
-    out.extend_from_slice(&audio.sample_rate.to_le_bytes());
-    out.extend_from_slice(&(audio.sample_rate * bytes_per_sample).to_le_bytes()); // bytes per second
-    out.extend_from_slice(&(bytes_per_sample as u16).to_le_bytes()); // bytes per frame
-    out.extend_from_slice(&16u16.to_le_bytes()); // bits per sample
-    // data chunk: the samples themselves
-    out.extend_from_slice(b"data");
-    out.extend_from_slice(&data_size.to_le_bytes());
-    for &x in &audio.samples {
-        out.extend_from_slice(&f64_to_i16(x).to_le_bytes());
-    }
-    out
+    todo!("l02: encode_wav: the fmt chunk, the data chunk header, then the samples")
 }
 
 /// Write audio to a WAV file.
@@ -67,7 +54,8 @@ pub fn encode_wav(audio: &Audio) -> Vec<u8> {
 /// `impl AsRef<Path>` means "anything that can be viewed as a file path":
 /// a `&str`, a `String` or a `PathBuf` all work.
 pub fn write_wav(path: impl AsRef<Path>, audio: &Audio) -> std::io::Result<()> {
-    std::fs::write(path, encode_wav(audio))
+    // One line: std::fs::write takes a path and the bytes to write.
+    todo!("l02: write_wav")
 }
 
 /// Read a little-endian u16 starting at `bytes[at]`. Given helper.
@@ -89,39 +77,8 @@ pub fn read_u32(bytes: &[u8], at: usize) -> u32 {
 ///
 /// Returns an error message (instead of crashing) for files it can't read.
 pub fn decode_wav(bytes: &[u8]) -> Result<Audio, String> {
-    if bytes.len() < 12 || &bytes[0..4] != b"RIFF" || &bytes[8..12] != b"WAVE" {
-        return Err("not a RIFF/WAVE file".to_string());
-    }
-    // (format tag, channels, sample rate, bits per sample), once we've seen "fmt "
-    let mut format: Option<(u16, u16, u32, u16)> = None;
-    let mut pos = 12;
-    while pos + 8 <= bytes.len() {
-        let id = &bytes[pos..pos + 4];
-        let size = read_u32(bytes, pos + 4) as usize;
-        let body_start = pos + 8;
-        let body = &bytes[body_start..(body_start + size).min(bytes.len())];
-
-        if id == b"fmt " {
-            if body.len() < 16 {
-                return Err("fmt chunk is too short".to_string());
-            }
-            let mut tag = read_u16(body, 0);
-            let channels = read_u16(body, 2);
-            let sample_rate = read_u32(body, 4);
-            let bits = read_u16(body, 14);
-            if tag == 0xFFFE && body.len() >= 26 {
-                // WAVE_FORMAT_EXTENSIBLE keeps the real format tag further in.
-                tag = read_u16(body, 24);
-            }
-            format = Some((tag, channels, sample_rate, bits));
-        } else if id == b"data" {
-            let (tag, channels, sample_rate, bits) = format.ok_or("data chunk before fmt chunk")?;
-            let samples = decode_samples(body, tag, channels, bits)?;
-            return Ok(Audio::new(sample_rate, samples));
-        }
-        pos = body_start + size + size % 2;
-    }
-    Err("no data chunk found".to_string())
+    // See the README for the chunk layout and for how `Result` and `?` work.
+    todo!("l02: decode_wav")
 }
 
 /// Turn the raw bytes of a "data" chunk into mono samples in [-1, 1].
@@ -130,37 +87,16 @@ pub fn decode_wav(bytes: &[u8]) -> Result<Audio, String> {
 /// Required: 16-bit integer PCM (format tag 1, 16 bits).
 /// Stretch goal: 8/24/32-bit PCM and 32-bit float (format tag 3).
 pub fn decode_samples(data: &[u8], format_tag: u16, channels: u16, bits: u16) -> Result<Vec<f64>, String> {
-    if channels == 0 || bits % 8 != 0 || bits == 0 {
-        return Err(format!("unsupported WAV layout: {channels} channels, {bits} bits"));
-    }
-    let channels = channels as usize;
-    let width = (bits / 8) as usize;
-    let frame_size = width * channels;
-    let mut out = Vec::with_capacity(data.len() / frame_size);
-    for frame in data.chunks_exact(frame_size) {
-        let mut sum = 0.0;
-        for b in frame.chunks_exact(width) {
-            sum += match (format_tag, bits) {
-                (1, 8) => (b[0] as f64 - 128.0) / 128.0, // 8-bit WAV is unsigned
-                (1, 16) => i16_to_f64(i16::from_le_bytes([b[0], b[1]])),
-                // Put the 3 bytes in the top of an i32, then shift back down:
-                // the arithmetic shift keeps the sign.
-                (1, 24) => (i32::from_le_bytes([0, b[0], b[1], b[2]]) >> 8) as f64 / 8_388_608.0,
-                (1, 32) => i32::from_le_bytes([b[0], b[1], b[2], b[3]]) as f64 / 2_147_483_648.0,
-                (3, 32) => f32::from_le_bytes([b[0], b[1], b[2], b[3]]) as f64,
-                _ => return Err(format!("unsupported WAV format: tag {format_tag}, {bits} bits")),
-            };
-        }
-        out.push(sum / channels as f64);
-    }
-    Ok(out)
+    // Start with 16-bit only and return an Err for anything else, e.g.
+    //     return Err(format!("unsupported: format {format_tag}, {bits} bits"));
+    todo!("l02: decode_samples")
 }
 
 /// Read a WAV file from disk.
 pub fn read_wav(path: impl AsRef<Path>) -> Result<Audio, String> {
-    let path = path.as_ref();
-    let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    decode_wav(&bytes)
+    // std::fs::read gives a Result<Vec<u8>, std::io::Error>. Turn its error
+    // into a String with `.map_err(|e| e.to_string())` so `?` can pass it on.
+    todo!("l02: read_wav")
 }
 
 #[cfg(test)]
