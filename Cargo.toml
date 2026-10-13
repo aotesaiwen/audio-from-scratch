@@ -1,0 +1,20 @@
+[package]
+name = "audio-from-scratch"
+version = "0.1.0"
+edition = "2024"
+description = "Learn audio signal processing and Rust together by building your own librosa + Praat, one lesson at a time."
+publish = false
+
+[lib]
+# Short name so examples can write `use lab::wav::read_wav;`
+name = "lab"
+path = "src/lib.rs"
+
+[dependencies]
+# None, on purpose. Every line of signal processing in this repo is code you
+# can read, and most of it is code you write.
+
+[profile.dev]
+# DSP crunches a lot of numbers. Unoptimised builds are ~20x slower, which
+# makes the FFT and pitch lessons painfully slow. Overflow checks stay on.
+opt-level = 2

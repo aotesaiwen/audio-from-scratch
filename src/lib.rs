@@ -1,0 +1,45 @@
+//! # lab: your audio-processing library
+//!
+//! You build this crate one lesson at a time. By the end it reads WAV files,
+//! filters them, computes spectrograms, mel spectrograms and MFCCs, tracks
+//! pitch, and measures jitter, shimmer and HNR. Those are the same features
+//! voice-disorder models are trained on, built here with no black boxes.
+//!
+//! The course map is in `README.md`. Each module says which lesson fills it in.
+
+
+// Given code: read it whenever you like, but you don't have to write it.
+pub mod plot;
+pub mod synth;
+#[cfg(test)]
+mod testutil;
+
+// Lesson 00: warm-up
+pub mod warmup;
+
+// Part I: Sound as numbers
+pub mod signal; // 01
+pub mod wav; // 02
+pub mod level; // 03
+pub mod aliasing; // 04
+
+// Part II: Working in time
+pub mod frames; // 05
+pub mod fir; // 06
+pub mod iir; // 07
+
+// Part III: Working in frequency
+pub mod complex; // 08
+pub mod dft; // 08
+pub mod fft; // 09
+pub mod window; // 10
+pub mod stft; // 11
+
+// Part IV: Speech features
+pub mod mel; // 12
+pub mod pitch; // 13
+pub mod voice; // 14
+
+// Bonus
+pub mod resample; // 15
+pub mod lpc; // 16
